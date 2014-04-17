@@ -145,14 +145,13 @@ end
 					<h2>A better optional type</h2>
 					<pre><code data-trim class="ruby">
 class Optional(T)
-  property :value
+  getter :value
 
-  def initialize @value
-  end
+  def value=(new_value : T) ; @value = new_value ; end
+  def value=(_ : NilType) ; @value = nil ; end
 
-  def initialize
-    @value = nil
-  end
+  def initialize(@value : T) ; end
+  def initialize ; @value = nil ; end
 end
 
 opt = Optional.new "kittens"
@@ -168,17 +167,6 @@ opt.value = 3 # compile time error
 				<section>
 					<h2>A better optional type part 2</h2>
 					<pre><code data-trim class="ruby">
-class Optional(T)
-  property :value
-
-  def initialize @value
-  end
-
-  def initialize
-    @value = nil
-  end
-end
-
 opt1 = Optional.new "kittens"
 opt2 = Optional.new 3
 assert(opt1.class != opt2.class)
