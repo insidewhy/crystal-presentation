@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Crystal - Super Happy Programming Language</title>
+
+		<meta name="description" content="A framework for easily creating beautiful presentations using HTML">
+		<meta name="author" content="Hakim El Hattab">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="stylesheet" href="css/reveal.min.css">
+		<link rel="stylesheet" href="css/theme/default.css" id="theme">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+		<script>
+			if( window.location.search.match( /print-pdf/gi ) ) {
+				var link = document.createElement( 'link' );
+				link.rel = 'stylesheet';
+				link.type = 'text/css';
+				link.href = 'css/print/pdf.css';
+				document.getElementsByTagName( 'head' )[0].appendChild( link );
+			}
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section>
+					<h1>Crystal</h1>
+          <ul>
+            <li>A new programming language with syntax almost identical to ruby's.</li>
+            <li>Statically rather than dynamically typed..</li>
+            <li>Good type inference engine means types can be omitted.</li>
+            <li>And a garbage collector.</li>
+            <li>Compiler can catch many errors at compile-time.</li>
+            <li>Better code performance (speed by factor of 3-20).</li>
+          </ul>
+				</section>
+
+				<section>
+					<h2>Types are optional in crystal</h2>
+					<pre><code data-trim class="ruby">
+def kitten_print(val : String)
+  puts "kitten string #{val}"
+end
+
+kitten_print("string")
+kitten_print(14) # compile time error
+					</code></pre>
+
+          <span>Methods can have types so the compiler can infer whether they have been called correctly and can be overloaded based on type:</span>
+
+					<pre><code data-trim class="ruby">
+def kitten_print(val : String)
+  puts "kitten string #{val}"
+end
+
+def kitten_print(val)
+  puts "kitten other #{val}"
+end
+
+kitten_print("string")
+kitten_print(14)
+					</code></pre>
+        </section>
+
+				<section>
+					<h2>Classes in Crystal</h2>
+					<pre><code data-trim class="ruby">
+class Optional
+  property :value
+
+  def initialize @value = nil
+  end
+end
+
+opt = Optional.new "kittens"
+opt.value = 3
+					</code></pre>
+          <ul>
+            <li>Crystal has some differences and extras to ruby.</li>
+            <li>What is the type of Optional's @value attribute here?</li>
+          </ul>
+				</section>
+
+				<section>
+					<h2>Classes in Crystal - part 2</h2>
+					<pre><code data-trim class="ruby">
+class Optional
+  property :value
+
+  def initialize @value = nil
+  end
+end
+
+opt = Optional.new "kittens"
+opt.value = 3
+					</code></pre>
+          <ul>
+            <li>Here @value has type "String | Int | NilType".</li>
+            <li>Every new type assigned to @value is added to the set at compile-time.</li>
+            <li>This is a "discriminated union" type.</li>
+          </ul>
+        </section>
+
+				<section>
+          <h2>Discriminated Unions</h2>
+          <ul>
+            <li>Data is stored on stack, space is reserved for largest type in set of types.</li>
+            <li>The data is also stored with a byte that indicates which of the possible types is stored in the union.</li>
+          </ul>
+
+					<pre><code data-trim class="ruby">
+val : String | NilType
+val = "14"
+str = val.to_s # fine as both String and NilType have method "to_s"
+
+unless val.nil?
+  # here the compiler knows val is not Nil due to the "unless"
+  # otherwise a compile-time error would be raised as += is
+  # not defined on NilType
+  val += " kittens"
+end
+					</code></pre>
+        </section>
+
+				<section>
+					<h2>A better optional type</h2>
+					<pre><code data-trim class="ruby">
+class Optional(T)
+  property :value
+
+  def initialize @value
+  end
+
+  def initialize
+    @value = nil
+  end
+end
+
+opt = Optional.new "kittens"
+					</code></pre>
+
+          <p>Now the type of @value is restricted to "NilType | String"</p>
+
+					<pre><code data-trim class="ruby">
+opt.value = 3 # compile time error
+					</code></pre>
+        </section>
+
+				<section>
+					<h2>A better optional type part 2</h2>
+					<pre><code data-trim class="ruby">
+class Optional(T)
+  property :value
+
+  def initialize @value
+  end
+
+  def initialize
+    @value = nil
+  end
+end
+
+opt1 = Optional.new "kittens"
+opt2 = Optional.new 3
+assert(opt1.class != opt2.class)
+					</code></pre>
+
+          <ul>
+            <li>opt1 is Optional(String) with @value type "String | NilType"</li>
+            <li>opt2 is Optional(Int) with @value type "Int | NilType"</li>
+          </ul>
+        </section>
+
+				<section>
+          <h2>Fun Crystal Facts</h2>
+          <ul>
+            <li>The crystal compiler is written in crystal.</li>
+            <li>It was hand-translated from ruby.</li>
+            <li>The type inference process for the compiler takes 4 seconds.</li>
+            <li>That's a small fraction of the compilation process.</li>
+          </ul>
+        </section>
+
+				<section>
+					<h1>THE END</h1>
+					<h3>James Pike</h3>
+				</section>
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.min.js"></script>
+
+		<script>
+
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+				// Parallax scrolling
+				// parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+				// parallaxBackgroundSize: '2100px 900px',
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+				]
+			});
+		</script>
+
+	</body>
+</html>
